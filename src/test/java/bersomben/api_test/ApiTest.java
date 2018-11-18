@@ -1,18 +1,13 @@
 package bersomben.api_test;
 
-import org.codehaus.groovy.transform.ConditionalInterruptibleASTTransformation;
-import org.hamcrest.Matcher;
+import static io.restassured.RestAssured.get;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.nullValue;
+
 import org.hamcrest.Matchers;
-import org.hamcrest.core.IsNot;
-import org.hamcrest.core.IsNull;
 import org.json.JSONObject;
 import org.junit.Test;
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ApiTest {
 
@@ -27,49 +22,46 @@ public class ApiTest {
 	@Test
 	public void getSpecific_us() {
 		get("http://services.groupkt.com/country/get/iso2code/US").then().statusCode(200)
-				.body("RestResponse.result.alpha2_code", is("US")).body("RestResponse.result.alpha3_code", is("USA"))
-				.body("RestResponse.result.name", is("United States of America"));
+				.body("RestResponse.result.alpha2_code", Matchers.equalTo("US"))
+				.body("RestResponse.result.alpha3_code", Matchers.equalTo("USA"))
+				.body("RestResponse.result.name", Matchers.equalTo("United States of America"));
 
 	}
 
 	@Test
 	public void getSpecific_de() {
 		get("http://services.groupkt.com/country/get/iso2code/DE").then().statusCode(200)
-				.body("RestResponse.result.alpha2_code", is("DE")).body("RestResponse.result.alpha3_code", is("DEU"))
-				.body("RestResponse.result.name", is("Germany"));
+				.body("RestResponse.result.alpha2_code", Matchers.equalTo("DE"))
+				.body("RestResponse.result.alpha3_code", Matchers.equalTo("DEU"))
+				.body("RestResponse.result.name", Matchers.equalTo("Germany"));
 
 	}
 
 	@Test
 	public void getSpecific_gb() {
 		get("http://services.groupkt.com/country/get/iso2code/GB").then().statusCode(200)
-				.body("RestResponse.result.alpha2_code", is("GB")).body("RestResponse.result.alpha3_code", is("GBR"))
-				.body("RestResponse.result.name", is("United Kingdom of Great Britain and Northern Ireland"));
+				.body("RestResponse.result.alpha2_code", Matchers.equalTo("GB"))
+				.body("RestResponse.result.alpha3_code", Matchers.equalTo("GBR")).body("RestResponse.result.name",
+						Matchers.equalTo("United Kingdom of Great Britain and Northern Ireland"));
 
 	}
 
 	@Test
 	public void getSpecific_ab() {
 		get("http://services.groupkt.com/country/get/iso2code/AB").then().statusCode(200)
-				.body("RestResponse.result", nullValue())
-				.body("RestResponse.messages[0]", is("No matching country found for requested code [AB]."));
+				.body("RestResponse.result", nullValue()).body("RestResponse.messages[0]",
+						Matchers.equalTo("No matching country found for requested code [AB]."));
 	}
 
 	@Test
 	public void postSpecific_TC() {
-		JSONObject jsonObj = new JSONObject()
-				.put("name", "Test Country")
-				.put("alpha2_code", "TC")
-				.put("alpha3_code","TCY");
+		JSONObject jsonObj = new JSONObject().put("name", "Test Country").put("alpha2_code", "TC").put("alpha3_code",
+				"TCY");
 
-		given()
-			.contentType("application/json") // another way to specify content type
-			.body(jsonObj.toString()) // use jsonObj toString method
-		.when()
-			.post("http://services.groupkt.com/country/post")
-		.then().assertThat()
-			.statusCode(200)
-			.body("RestResponse.messages[0]", is("Country added or overwritten [TC]."));
+		given().contentType("application/json") // another way to specify content type
+				.body(jsonObj.toString()) // use jsonObj toString method
+				.when().post("http://services.groupkt.com/country/post").then().assertThat().statusCode(200)
+				.body("RestResponse.messages[0]", Matchers.equalTo("Country added or overwritten [TC]."));
 	}
 
 }
